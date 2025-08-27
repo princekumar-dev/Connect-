@@ -1,4 +1,4 @@
-<html>
+<<html>
   <head>
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
     <link
@@ -356,11 +356,30 @@
 
         function renderEvents(events) {
           const container = document.querySelector('.layout-content-container');
-          const eventList = document.createElement('div');
-          eventList.innerHTML = '';
-          eventList.className = '';
           // Remove previous custom events
           Array.from(container.querySelectorAll('.custom-event')).forEach(e => e.remove());
+          // Remove previous no-events message
+          Array.from(container.querySelectorAll('.no-events-message')).forEach(e => e.remove());
+
+          if (!events || events.length === 0) {
+            // Show "No events found" message centered
+            const noEventsDiv = document.createElement('div');
+            noEventsDiv.className = 'no-events-message flex flex-col items-center justify-center p-8 text-[#60758a] w-full';
+            noEventsDiv.style.display = 'flex';
+            noEventsDiv.style.justifyContent = 'center';
+            noEventsDiv.style.alignItems = 'center';
+            noEventsDiv.style.minHeight = '300px';
+            noEventsDiv.innerHTML = `
+              <svg class="w-16 h-16 mb-4 text-[#3d99f5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" />
+              </svg>
+              <p class="text-xl font-semibold text-center">No events found</p>
+              <p class="text-base mt-2 text-center">There are currently no upcoming events.</p>
+            `;
+            container.appendChild(noEventsDiv);
+            return;
+          }
+
           events.forEach(event => {
             const eventCard = document.createElement('div');
             eventCard.className = 'custom-event p-4';
@@ -371,11 +390,9 @@
               const dateObj = new Date(event.date);
               const options = { year: 'numeric', month: 'long', day: 'numeric' };
               formattedDate = dateObj.toLocaleDateString('en-US', options);
-              // If event.time is like '20:00' or '8:00 PM - 10:00 PM', handle both
               if (event.time && event.time.includes('-')) {
                 formattedTime = event.time;
               } else if (event.time) {
-                // Assume event.time is start time, no end time
                 let startTime = event.time;
                 let startDate = new Date(`${event.date}T${startTime}`);
                 formattedTime = startDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
@@ -540,3 +557,6 @@
     </script>
   </body>
 </html>
+
+</html>
+
