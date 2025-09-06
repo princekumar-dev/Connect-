@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <html>
   <head>
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
@@ -528,3 +529,535 @@ After starting the server, refresh this page or click "Check Again".
     </script>
   </body>
 </html>
+=======
+<html>
+  <head>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link
+      rel="stylesheet"
+      as="style"
+      onload="this.rel='stylesheet'"
+      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Plus+Jakarta+Sans%3Awght%40400%3B500%3B700%3B800"
+    />
+
+    <title>MSEC Connect</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+      .wave-text {
+        background: linear-gradient(90deg, #3d99f5, #c0c0c0, #3d99f5, #c0c0c0);
+        background-size: 300% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: wave-animation 3s ease-in-out infinite;
+        transition: all 0.3s ease;
+      }
+      
+      @keyframes wave-animation {
+        0%, 100% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+      }
+      
+      .wave-text:hover {
+        animation-duration: 1s;
+        transform: scale(1.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden" style='font-family: "Plus Jakarta Sans", "Noto Sans", sans-serif;'>
+      <div class="layout-container flex h-full grow flex-col">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f0f2f5] px-10 py-3">
+          <div class="flex items-center gap-8">
+            <div class="flex items-center gap-4 text-[#111418]">
+              <div class="size-4">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g clip-path="url(#clip0_6_543)">
+                    <path
+                      d="M42.1739 20.1739L27.8261 5.82609C29.1366 7.13663 28.3989 10.1876 26.2002 13.7654C24.8538 15.9564 22.9595 18.3449 20.6522 20.6522C18.3449 22.9595 15.9564 24.8538 13.7654 26.2002C10.1876 28.3989 7.13663 29.1366 5.82609 27.8261L20.1739 42.1739C21.4845 43.4845 24.5355 42.7467 28.1133 40.548C30.3042 39.2016 32.6927 37.3073 35 35C37.3073 32.6927 39.2016 30.3042 40.548 28.1133C42.7467 24.5355 43.4845 21.4845 42.1739 20.1739Z"
+                      fill="currentColor"
+                    ></path>
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M7.24189 26.4066C7.31369 26.4411 7.64204 26.5637 8.52504 26.3738C9.59462 26.1438 11.0343 25.5311 12.7183 24.4963C14.7583 23.2426 17.0256 21.4503 19.238 19.238C21.4503 17.0256 23.2426 14.7583 24.4963 12.7183C25.5311 11.0343 26.1438 9.59463 26.3738 8.52504C26.5637 7.64204 26.4411 7.31369 26.4066 7.24189C26.345 7.21246 26.143 7.14535 25.6664 7.1918C24.9745 7.25925 23.9954 7.5498 22.7699 8.14278C20.3369 9.32007 17.3369 11.4915 14.4142 14.4142C11.4915 17.3369 9.32007 20.3369 8.14278 22.7699C7.5498 23.9954 7.25925 24.9745 7.1918 25.6664C7.14534 26.143 7.21246 26.345 7.24189 26.4066ZM29.9001 10.7285C29.4519 12.0322 28.7617 13.4172 27.9042 14.8126C26.465 17.1544 24.4686 19.6641 22.0664 22.0664C19.6641 24.4686 17.1544 26.465 14.8126 27.9042C13.4172 28.7617 12.0322 29.4519 10.7285 29.9001L21.5754 40.747C21.6001 40.7606 21.8995 40.931 22.8729 40.7217C23.9424 40.4916 25.3821 39.879 27.0661 38.8441C29.1062 37.5904 31.3734 35.7982 33.5858 33.5858C35.7982 31.3734 37.5904 29.1062 38.8441 27.0661C39.879 25.3821 40.4916 23.9425 40.7216 22.8729C40.931 21.8995 40.7606 21.6001 40.747 21.5754L29.9001 10.7285ZM29.2403 4.41187L43.5881 18.7597C44.9757 20.1473 44.9743 22.1235 44.6322 23.7139C44.2714 25.3919 43.4158 27.2666 42.252 29.1604C40.8128 31.5022 38.8165 34.012 36.4142 36.4142C34.012 38.8165 31.5022 40.8128 29.1604 42.252C27.2666 43.4158 25.3919 44.2714 23.7139 44.6322C22.1235 44.9743 20.1473 44.9757 18.7597 43.5881L4.41187 29.2403C3.29027 28.1187 3.08209 26.5973 3.21067 25.2783C3.34099 23.9415 3.8369 22.4852 4.54214 21.0277C5.96129 18.0948 8.43335 14.7382 11.5858 11.5858C14.7382 8.43335 18.0948 5.9613 21.0277 4.54214C22.4852 3.8369 23.9415 3.34099 25.2783 3.21067C26.5973 3.08209 28.1187 3.29028 29.2403 4.41187Z"
+                      fill="currentColor"
+                    ></path>
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_6_543"><rect width="48" height="48" fill="white"></rect></clipPath>
+                  </defs>
+                </svg>
+              </div>
+              <h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">
+                <span class="text-[#111418]">MSEC</span> <span class="wave-text">Connect</span>
+              </h2>
+            </div>
+            <div class="flex items-center gap-9">
+              <a class="text-[#111418] text-sm font-medium leading-normal" href="index.html">Home</a>
+              <a class="text-[#111418] text-sm font-medium leading-normal" href="venue.html">Venues</a>
+              <a class="text-[#111418] text-sm font-medium leading-normal" href="events.html">Events</a>
+              <a id="bookingStatusLink" class="text-[#111418] text-sm font-medium leading-normal hidden" href="booking-status.html">Booking Status</a>
+              <a id="bookingsLink" class="text-[#111418] text-sm font-medium leading-normal hidden" href="bookings.html">Bookings</a>
+              <a class="text-[#111418] text-sm font-medium leading-normal" href="#">Contact</a>
+            </div>
+          </div>
+          <div class="flex flex-1 justify-end gap-8">
+            <label class="flex flex-col min-w-40 !h-10 max-w-64">
+              <div class="flex w-full flex-1 items-stretch rounded-xl h-full">
+                <div
+                  class="text-[#60758a] flex border-none bg-[#f0f2f5] items-center justify-center pl-4 rounded-l-xl border-r-0"
+                  data-icon="MagnifyingGlass"
+                  data-size="24px"
+                  data-weight="regular"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                    <path
+                      d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"
+                    ></path>
+                  </svg>
+                </div>
+                <input
+                  placeholder="Search"
+                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#111418] focus:outline-0 focus:ring-0 border-none bg-[#f0f2f5] focus:border-none h-full placeholder:text-[#60758a] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
+                  value=""
+                />
+              </div>
+            </label>
+            <!-- Login/Logout section -->
+            <div id="authSection" class="flex items-center gap-2">
+              <a
+                id="loginLink"
+                href="login.html"
+                class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#3d99f5] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+              >
+                <span class="truncate">Login</span>
+              </a>
+              <div id="loggedInSection" class="hidden flex items-center gap-2">
+                <span id="userEmail" class="text-sm text-[#60758a]"></span>
+                <button
+                  id="logoutBtn"
+                  onclick="handleLogout()"
+                  class="flex min-w-[60px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-8 px-3 bg-[#f0f2f5] text-[#60758a] text-xs font-medium leading-normal"
+                >
+                  <span class="truncate">Logout</span>
+                </button>
+              </div>
+            </div>
+            <a
+              href="book.html"
+              class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#3d99f5] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+            >
+              <span class="truncate">Book Now</span>
+            </a>
+          </div>
+        </header>
+        
+        <!-- Notification System -->
+        <div id="notificationContainer" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 space-y-2 max-w-sm"></div>
+        
+        <!-- Server Status Notification -->
+        <div id="serverStatusNotification" class="hidden">
+          <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mx-4 mt-4 rounded-r-lg">
+            <div class="flex items-center justify-between">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm text-yellow-800">
+                    <strong>Server Not Running:</strong> The booking system requires the backend server to be running.
+                  </p>
+                  <p class="text-xs text-yellow-700 mt-1">
+                    Click "Start Server" to automatically start the server, or run <code class="bg-yellow-100 px-1 rounded">start-server.bat</code> manually.
+                  </p>
+                </div>
+              </div>
+              <div class="flex space-x-2">
+                <button onclick="startServer()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm font-medium transition-colors">
+                  Start Server
+                </button>
+                <button onclick="checkServerStatus()" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm font-medium transition-colors">
+                  Check Again
+                </button>
+                <button onclick="dismissNotification()" class="text-yellow-400 hover:text-yellow-600">
+                  <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="px-40 flex flex-1 justify-center py-5">
+          <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+            <div class="@container">
+              <div class="@[480px]:p-4">
+                <div
+                  class="flex min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-xl items-center justify-center p-4"
+                  style='background-image: linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuA0bDcgsOOS--nJbYESTSwEsVxq4Hv4wzU1a5ZX3NDHDgg7om4wDbQBfuX6nDoTpg_5LXJB5RPITfxpybELrj5OO0S8Y2Ymx5ZA2yWcsTZwg564ZA8UUWSRi27MmgAcUm5fwUtNh7NCHpf2w1DqcySXO64bRaXxqPfUo-GhGzRWe3JdpfcNMPbzUT-HqcDlXRX6-VaU3ozc6LGPnK58ZQAdAPAL4FPSL4smWn0-R5U-zstlyvlhUBc5k6-kfi_6HDszcwU3oCXQJIg");'
+                >
+                  <div class="flex flex-col gap-2 text-center">
+                    <h1
+                      class="text-white text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]"
+                    >
+                      Find the Perfect Venue for Your Event
+                    </h1>
+                    <h2 class="text-white text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal">
+                      Discover a wide range of seminar halls and auditoriums at top colleges. Book your ideal space with ease.
+                    </h2>
+                  </div>
+                  <label class="flex flex-col min-w-40 h-14 w-full max-w-[480px] @[480px]:h-16">
+                    <div class="flex w-full flex-1 items-stretch rounded-xl h-full">
+                      <div
+                        class="text-[#60758a] flex border border-[#dbe0e6] bg-white items-center justify-center pl-[15px] rounded-l-xl border-r-0"
+                        data-icon="MagnifyingGlass"
+                        data-size="20px"
+                        data-weight="regular"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                          <path
+                            d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"
+                          ></path>
+                        </svg>
+                      </div>
+                      <input
+                        placeholder="Search for venues"
+                        class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#111418] focus:outline-0 focus:ring-0 border border-[#dbe0e6] bg-white focus:border-[#dbe0e6] h-full placeholder:text-[#60758a] px-[15px] rounded-r-none border-r-0 pr-2 rounded-l-none border-l-0 pl-2 text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal"
+                        value=""
+                      />
+                      <div class="flex items-center justify-center rounded-r-xl border-l-0 border border-[#dbe0e6] bg-white pr-[7px]">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-[#3d99f5] text-white text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]"
+                        >
+                          <span class="truncate">Search</span>
+                        </button>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <h2 class="text-[#111418] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Featured Venues</h2>
+            <div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
+              <a href="book.html?hall=KRS Seminar Hall" class="flex flex-col gap-3 pb-3 cursor-pointer">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA2rlCnsNR-UIxfZ0nNZolyZ43Pyr4wbO3p6NjlpiLcJqfGo4-6gywzRYgebe49V5NLwYHKio1Km-Wm99VwrDV1atwmIi5CrG_NoZMLX_mOH0HD9VwWVFl_PnDlKZ-9_bbDRy9c5ShrVvy5AbRl17CpKHWGqhjEL0ZXbxjUxbOJ8SiuOQeAukJFr3x1gLhm1WRWsXdHPPyiwoQd7XTFKWqEdUAbI9MEMfyncRv5LUas-pLcJZZcHHNDctfcn7STh3vvCPgGf2Dyh70");'
+                ></div>
+                <div>
+                  <p class="text-[#111418] text-base font-medium leading-normal">KRS Seminar Hall</p>
+                  <p class="text-[#60758a] text-sm font-normal leading-normal">Capacity: 50-70</p>
+                </div>
+              </a>
+              <a href="book.html?hall=Civil Seminar Hall" class="flex flex-col gap-3 pb-3 cursor-pointer">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDjgOsL-A_REeuufLssM9EaibUxhAZgBKl8mndnm53aGLmLVH3ziHCXfaaHFugP5IVhumadYGjM2GpR-ekOidyzzDYktalRt85wVVvr8wSjrcWZmHSNEHHba6b2gnG_fOqK1DAcocBkPjyB0yvSE31LvjRIlfH70Huu7uI_2JEmB5mXeljDeCwb4_W_HgN5gR2K3Q10NDtl3mytzYbVk3TT2tgpDz1JYfismI5NVzR5tQe17C92ex_uKr6YT3BHaAoxQ5j7ns8FpKs");'
+                ></div>
+                <div>
+                  <p class="text-[#111418] text-base font-medium leading-normal">Civil Seminar Hall</p>
+                  <p class="text-[#60758a] text-sm font-normal leading-normal">Capacity: 200-300</p>
+                </div>
+              </a>
+              <a href="book.html?hall=ECE Seminar Hall" class="flex flex-col gap-3 pb-3 cursor-pointer">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDmDbqEQHXUH4wr8OzixBFXpS311YEI7jTQw9LcPA6te44iHZk46T583WS6nm3l5zDharhmzGVglc4xwDju3sEe4FE6wQA-z7MLQc1B4_Q9DSYPG2xA8leVU6k2EOq4JRAak99vq2haLa2FjVdvV599Y4A3tBUCFvxp88-iECvOU1RxKXG5E86ClsGMozvxFh9P9OE8GgDALOE1xHDYYUdDastf6SydcfBhft71r62Jwf2KSZcxpWHr9hJTeuAuWwSSfV8li5QdYN0");'
+                ></div>
+                <div>
+                  <p class="text-[#111418] text-base font-medium leading-normal">ECE Seminar Hall</p>
+                  <p class="text-[#60758a] text-sm font-normal leading-normal">Capacity: 30-50</p>
+                </div>
+              </a>
+              <a href="book.html?hall=MS Auditorium" class="flex flex-col gap-3 pb-3 cursor-pointer">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDd8eFSd1-5Wu-7D4PPy3b2KZOeSg2q68ctGvHwSBihGwh-mDrb_xUaQoBNnffDYf1eNzlFp8xlvxhQ05eVsly3b4HNtvn9pKvcyvKV6bu_SNe_HHT17IRLd-67WeadUpB2wntrcLItcpe4TnrgzE9yaI36fTrdx7EbD8N9BCpverP68hnL0LFsOivIdqZxdeM1KtQARdHNqbR00tVzKB66MfxgNnL_xJ2hqEJve-C-xZQerh0VVvbHdULnneqg2iJZiamHDYL1EtU");'
+                ></div>
+                <div>
+                  <p class="text-[#111418] text-base font-medium leading-normal">MS Auditorium</p>
+                  <p class="text-[#60758a] text-sm font-normal leading-normal">Capacity: 80-100</p>
+                </div>
+              </a>
+            </div>
+            <h2 class="text-[#111418] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Contact Us</h2>
+            <p class="text-[#111418] text-base font-normal leading-normal pb-3 pt-1 px-4 text-center">Have questions or need assistance? Reach out to our team for support.</p>
+            <div class="flex px-4 py-3 justify-center">
+              <button
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#3d99f5] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+              >
+                <span class="truncate">Contact Us</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <footer class="flex justify-center">
+          <div class="flex max-w-[960px] flex-1 flex-col">
+            <footer class="flex flex-col gap-6 px-5 py-10 text-center @container">
+              <div class="flex flex-wrap items-center justify-center gap-6 @[480px]:flex-row @[480px]:justify-around">
+                <a class="text-[#60758a] text-base font-normal leading-normal min-w-40" href="#">Privacy Policy</a>
+                <a class="text-[#60758a] text-base font-normal leading-normal min-w-40" href="#">Terms of Service</a>
+                <a class="text-[#60758a] text-base font-normal leading-normal min-w-40" href="#">FAQ</a>
+              </div>
+              <p class="text-[#60758a] text-base font-normal leading-normal">© 2024 MSEC Connect. All rights reserved.</p>
+            </footer>
+          </div>
+        </footer>
+      </div>
+    </div>
+    <script>
+      // Notification System
+      function showNotification(message, type = 'success', duration = 4000) {
+        const container = document.getElementById('notificationContainer');
+        const notification = document.createElement('div');
+        
+        // Set base classes
+        notification.className = `
+          transform transition-all duration-500 ease-in-out -translate-y-full opacity-0
+          p-4 rounded-lg shadow-lg border-l-4 backdrop-blur-sm
+          flex items-center justify-between min-w-[300px] max-w-sm
+        `;
+        
+        // Set type-specific styles
+        const styles = {
+          success: {
+            bg: 'bg-green-50 border-green-500 text-green-800',
+            icon: `<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>`
+          },
+          error: {
+            bg: 'bg-red-50 border-red-500 text-red-800',
+            icon: `<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>`
+          },
+          warning: {
+            bg: 'bg-yellow-50 border-yellow-500 text-yellow-800',
+            icon: `<svg class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>`
+          },
+          info: {
+            bg: 'bg-blue-50 border-blue-500 text-blue-800',
+            icon: `<svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            </svg>`
+          }
+        };
+        
+        const style = styles[type] || styles.success;
+        notification.className += ` ${style.bg}`;
+        
+        notification.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <div class="flex-shrink-0">
+              ${style.icon}
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium">${message}</p>
+            </div>
+          </div>
+          <button class="ml-3 flex-shrink-0 text-current opacity-50 hover:opacity-75 transition-opacity" onclick="this.parentElement.remove()">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+          </button>
+        `;
+        
+        container.appendChild(notification);
+        
+        // Animate in
+        setTimeout(() => {
+          notification.classList.remove('-translate-y-full', 'opacity-0');
+          notification.classList.add('translate-y-0', 'opacity-100');
+        }, 100);
+        
+        // Auto remove
+        setTimeout(() => {
+          notification.classList.add('-translate-y-full', 'opacity-0');
+          setTimeout(() => {
+            if (notification.parentElement) {
+              notification.remove();
+            }
+          }, 500);
+        }, duration);
+        
+        return notification;
+      }
+      
+      // Specific notification functions
+      function showSuccess(message, duration = 4000) {
+        return showNotification(message, 'success', duration);
+      }
+      
+      function showError(message, duration = 5000) {
+        return showNotification(message, 'error', duration);
+      }
+      
+      function showWarning(message, duration = 4500) {
+        return showNotification(message, 'warning', duration);
+      }
+      
+      function showInfo(message, duration = 4000) {
+        return showNotification(message, 'info', duration);
+      }
+      
+      // Check authentication status and update UI
+      function updateAuthUI() {
+        var isLoggedIn = localStorage.getItem('isLoggedIn');
+        var userEmail = localStorage.getItem('userEmail');
+        var userRole = localStorage.getItem('userRole');
+        var loginLink = document.getElementById('loginLink');
+        var loggedInSection = document.getElementById('loggedInSection');
+        var userEmailSpan = document.getElementById('userEmail');
+        var bookingsLink = document.getElementById('bookingsLink');
+        var bookingStatusLink = document.getElementById('bookingStatusLink');
+        if (isLoggedIn === 'true' && userEmail) {
+          loginLink.classList.add('hidden');
+          loggedInSection.classList.remove('hidden');
+          loggedInSection.classList.add('flex');
+          userEmailSpan.textContent = userEmail;
+          if (userRole === 'admin') {
+            bookingsLink.classList.remove('hidden');
+            bookingStatusLink.classList.add('hidden');
+          } else {
+            bookingsLink.classList.add('hidden');
+            bookingStatusLink.classList.remove('hidden');
+          }
+        } else {
+          loginLink.classList.remove('hidden');
+          loggedInSection.classList.add('hidden');
+          loggedInSection.classList.remove('flex');
+          bookingsLink.classList.add('hidden');
+          bookingStatusLink.classList.add('hidden');
+        }
+      }
+      
+      // Handle logout
+      function handleLogout() {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('userEmail');
+        updateAuthUI();
+        showSuccess('You have been logged out successfully!');
+      }
+      
+      // Update UI when page loads
+      document.addEventListener('DOMContentLoaded', function() {
+    // Strict authentication check: redirect to login if not logged in
+    var isLoggedIn = localStorage.getItem('isLoggedIn');
+    var userEmail = localStorage.getItem('userEmail');
+    if (isLoggedIn !== 'true' || !userEmail) {
+      window.location.href = 'login.html?returnUrl=' + encodeURIComponent(window.location.href);
+      return;
+    }
+  updateAuthUI();
+  checkServerStatus();
+      });
+      
+      // Server connectivity functions
+      let serverCheckTimeout;
+      
+      async function checkServerStatus() {
+        try {
+          const response = await fetch('http://localhost:3000/api/health', {
+            method: 'GET',
+            timeout: 5000
+          });
+          
+          if (response.ok) {
+            // Server is running
+            document.getElementById('serverStatusNotification').classList.add('hidden');
+          } else {
+            throw new Error('Server not responding');
+          }
+        } catch (error) {
+          // Server is not running
+          document.getElementById('serverStatusNotification').classList.remove('hidden');
+        }
+      }
+      
+      async function startServer() {
+        try {
+          // Show loading state
+          const startButton = event.target;
+          startButton.textContent = 'Starting...';
+          startButton.disabled = true;
+          
+          // Try to start server by making a request that triggers server startup
+          // Note: This works if the server auto-starts on first request
+          const response = await fetch('http://localhost:3000/api/health');
+          
+          if (response.ok) {
+            document.getElementById('serverStatusNotification').classList.add('hidden');
+            showSuccess('Server is now running!');
+          } else {
+            throw new Error('Failed to start server');
+          }
+        } catch (error) {
+          // If automatic start fails, provide manual instructions
+          const confirmed = confirm(
+            'Automatic server start failed. Would you like to start the server manually?\n\n' +
+            'Click OK to open the server startup instructions, or Cancel to continue.'
+          );
+          
+          if (confirmed) {
+            // Create and download a simple script to start the server
+            showStartupInstructions();
+          }
+        } finally {
+          // Reset button
+          const startButton = event.target;
+          startButton.textContent = 'Start Server';
+          startButton.disabled = false;
+        }
+      }
+      
+      function showStartupInstructions() {
+        const instructions = `
+To start the MSEC Connect server:
+
+1. Open Command Prompt or PowerShell
+2. Navigate to the project folder: ${window.location.pathname.replace('/index.html', '')}
+3. Run: start-server.bat
+   OR
+   Run: npm start
+   OR 
+   Run: node server.js
+
+The server will start on http://localhost:3000
+
+After starting the server, refresh this page or click "Check Again".
+        `;
+        
+        showInfo(instructions, 8000);
+        
+        // Also try to open the project folder (if possible)
+        try {
+          // This will work in some browsers/environments
+          window.open('file://' + window.location.pathname.replace('/index.html', ''));
+        } catch (e) {
+          console.log('Could not open folder automatically');
+        }
+      }
+      
+      function dismissNotification() {
+        document.getElementById('serverStatusNotification').classList.add('hidden');
+      }
+      
+      // Check server status periodically
+      setInterval(checkServerStatus, 30000); // Check every 30 seconds
+    </script>
+  </body>
+</html>
+>>>>>>> cabfcf0 (Save local changes before rebase)

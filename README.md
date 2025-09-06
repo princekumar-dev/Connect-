@@ -1,6 +1,3 @@
-# Connect-
-MSEC Connect is a complete venue booking system with user authentication, an admin dashboard for managing bookings, and real-time updates. It features a modern, responsive UI using Tailwind CSS and stores data in JSON files. The system streamlines venue booking and administration for educational institutions.
-
 # MSEC Connect - Venue Booking System
 
 A complete venue booking system with backend server and admin dashboard.
@@ -159,4 +156,3 @@ For issues or questions, please check:
 ---
 
 **MSEC Connect** - Streamlining venue booking for educational institutions.
-
