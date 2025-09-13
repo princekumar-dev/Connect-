@@ -14,6 +14,9 @@
   <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <style>
+    /* Search button hover fix */
+    .form-input[placeholder="Search"]:hover {
+    }
     .wave-text {
       background: linear-gradient(90deg, #3d99f5, #c0c0c0, #3d99f5, #c0c0c0);
       background-size: 300% 100%;
@@ -587,12 +590,32 @@
             <p class="text-[#637588] text-xs font-medium">Date: ${date}</p>
             ${(booking.bookedAt || booking.createdAt) ? `<p class=\"text-[#637588] text-xs font-medium\">Booked at: ${new Date(booking.bookedAt || booking.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}</p>` : ''}
             <!-- Removed timeInfo line as requested -->
+            ${booking.status === 'reassigned' && booking.reassignedInfo ? `
+              <div class='mt-2 p-3 rounded bg-yellow-50 border border-yellow-400'>
+                <p class='text-yellow-800 text-xs font-semibold mb-1'>Booking was moved due to a higher priority booking:</p>
+                <ul class='text-yellow-700 text-xs ml-2'>
+                  <li><strong>Old Venue:</strong> ${booking.reassignedInfo.oldVenue}</li>
+                  <li><strong>New Venue:</strong> ${booking.reassignedInfo.newVenue}</li>
+                  <li><strong>Reason:</strong> ${booking.reassignedInfo.reason}</li>
+                  <li><strong>Moved At:</strong> ${new Date(booking.reassignedInfo.movedAt).toLocaleString()}</li>
+                </ul>
+              </div>
+            ` : ''}
+            ${booking.status === 'cancelled' && booking.reassignedInfo ? `
+              <div class='mt-2 p-3 rounded bg-red-50 border border-red-400'>
+                <p class='text-red-800 text-xs font-semibold mb-1'>Booking was cancelled due to a higher priority booking:</p>
+                <ul class='text-red-700 text-xs ml-2'>
+                  <li><strong>Old Venue:</strong> ${booking.reassignedInfo.oldVenue}</li>
+                  <li><strong>Reason:</strong> ${booking.reassignedInfo.reason}</li>
+                  <li><strong>Cancelled At:</strong> ${new Date(booking.reassignedInfo.movedAt).toLocaleString()}</li>
+                </ul>
+              </div>
+            ` : ''}
           </div>
           <div class="${statusClass}">
             ${statusText}
           </div>
         </div>
-        
         <div class="grid grid-cols-2 gap-4 mb-4">
           <div>
             <p class="text-[#637588] text-xs font-medium uppercase tracking-wide mb-1">Date</p>
@@ -603,17 +626,14 @@
             <p class="text-[#111418] font-medium">${booking.time || 'Not specified'}</p>
           </div>
         </div>
-        
         <div class="mb-4">
           <p class="text-[#637588] text-xs font-medium uppercase tracking-wide mb-1">Attendees</p>
           <p class="text-[#111418] font-medium">${booking.attendees || 'Not specified'} people</p>
         </div>
-        
         <div class="border-t border-[#e2e8f0] pt-4 mb-4">
           <p class="text-[#637588] text-xs font-medium uppercase tracking-wide mb-1">Booking ID</p>
           <p class="text-[#111418] text-sm font-mono">${booking.id}</p>
         </div>
-        
         <div class="border-t border-[#e2e8f0] pt-4">
           <div class="flex items-center">
             <div>

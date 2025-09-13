@@ -9,10 +9,31 @@
     },
     {
       "id": 2,
-      "email": "user@msec.edu.in",
-      "password": "user@123",
-      "name": "User",
-      "role": "user"
+      "email": "staff@msec.edu.in",
+      "password": "staff@123",
+      "name": "Staff",
+      "role": "staff"
+    },
+    {
+      "id": 3,
+      "email": "hod@msec.edu.in",
+      "password": "hod@123",
+      "name": "HOD",
+      "role": "hod"
+    },
+    {
+      "id": 4,
+      "email": "principal@msec.edu.in",
+      "password": "principal@123",
+      "name": "Principal",
+      "role": "principal"
+    },
+    {
+      "id": 5,
+      "email": "secretary@msec.edu.in",
+      "password": "secretary@123",
+      "name": "Secretary",
+      "role": "secretary"
     }
   ]
 }

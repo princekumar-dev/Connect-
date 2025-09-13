@@ -24,7 +24,10 @@ if (!fs.existsSync(USERS_FILE)) {
     const initialUsers = {
         users: [
             { id: 1, email: 'admin@msec.edu.in', password: 'admin@123', name: 'Administrator', role: 'admin' },
-            { id: 2, email: 'user@msec.edu.in', password: 'user@123', name: 'User', role: 'user' }
+            { id: 2, email: 'staff@msec.edu.in', password: 'staff@123', name: 'Staff', role: 'staff' },
+            { id: 3, email: 'hod@msec.edu.in', password: 'hod@123', name: 'HOD', role: 'hod' },
+            { id: 4, email: 'principal2msec.edu.in', password: 'principal@123', name: 'Principal', role: 'principal' },
+            { id: 5, email: 'secretary@msec.edu.in', password: 'secretary@123', name: 'Secretary', role: 'secretary' }
         ]
     };
     fs.writeFileSync(USERS_FILE, JSON.stringify(initialUsers, null, 2));
@@ -230,10 +233,30 @@ app.post('/api/login', (req, res) => {
 app.get('/api/bookings', verifyAdmin, (req, res) => {
     try {
         const data = readBookings();
+        // Priority order: secretary > principal > hod > staff
+        const priorityOrder = ['secretary', 'principal', 'hod', 'staff'];
+        const users = readUsers().users;
+        // Helper to get role for booking
+        function getRole(email) {
+            const user = users.find(u => u.email === email);
+            return user ? user.role : '';
+        }
+        // Sort bookings by priority
+        const sortedBookings = [...data.bookings].sort((a, b) => {
+            const roleA = getRole(a.email);
+            const roleB = getRole(b.email);
+            const idxA = priorityOrder.indexOf(roleA);
+            const idxB = priorityOrder.indexOf(roleB);
+            // Lower index = higher priority
+            if (idxA === -1 && idxB === -1) return 0;
+            if (idxA === -1) return 1;
+            if (idxB === -1) return -1;
+            return idxA - idxB;
+        });
         res.json({ 
             success: true, 
-            bookings: data.bookings,
-            count: data.bookings.length
+            bookings: sortedBookings,
+            count: sortedBookings.length
         });
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch bookings' });
@@ -287,15 +310,69 @@ app.get('/api/user/bookings', (req, res) => {
 app.post('/api/bookings', (req, res) => {
     try {
         const { venue, date, time, attendees, organizer, email, purpose } = req.body;
-        
         // Validate required fields
         if (!venue || !date || !time || !attendees || !organizer || !email || !purpose) {
             return res.status(400).json({ error: 'All fields are required' });
         }
-        
         const data = readBookings();
         const newId = Math.max(...data.bookings.map(b => b.id), 0) + 1;
-
+        // Get user role from users.json
+        const users = readUsers().users;
+        const user = users.find(u => u.email === email);
+        // Priority mapping
+        const priorityMap = { secretary: 1, principal: 2, hod: 3, staff: 4 };
+        const userPriority = user && priorityMap[user.role] ? priorityMap[user.role] : 99;
+        let bookingStatus = 'pending';
+        // Find all bookings for same venue/date/time
+        const conflictingBookings = data.bookings.filter(b =>
+            b.venue === venue &&
+            b.date === date &&
+            b.time === time &&
+            b.status !== 'cancelled'
+        );
+        // Check if any higher priority booking exists
+        const higherExists = conflictingBookings.some(b => b.priority && b.priority < userPriority);
+        if (userPriority === 1 || !higherExists) {
+            bookingStatus = 'confirmed'; // Auto-approve if secretary or no higher priority exists
+        }
+        // If this booking is higher priority than any conflicting booking, move lower priority bookings
+        if (conflictingBookings.length > 0 && bookingStatus === 'confirmed') {
+            // Get all halls (venues) from existing bookings and a static list
+            const allVenues = [
+                'Main Hall', 'Conference Room', 'Auditorium', 'Seminar Hall', 'Lecture Hall 1', 'Lecture Hall 2', 'Lecture Hall 3', 'Lecture Hall 4'
+            ];
+            conflictingBookings.forEach(conflict => {
+                if (conflict.priority > userPriority) {
+                    // Find an available hall for the lower priority booking
+                    const bookedVenues = data.bookings.filter(b =>
+                        b.date === conflict.date &&
+                        b.time === conflict.time &&
+                        b.status !== 'cancelled'
+                    ).map(b => b.venue);
+                    const availableVenues = allVenues.filter(v => !bookedVenues.includes(v));
+                    if (availableVenues.length > 0) {
+                        // Move booking to first available hall
+                        conflict.venue = availableVenues[0];
+                        conflict.status = 'reassigned';
+                        conflict.reassignedInfo = {
+                            oldVenue: venue,
+                            newVenue: availableVenues[0],
+                            reason: `Booking moved due to higher priority booking by ${user.role}`,
+                            movedAt: new Date().toISOString()
+                        };
+                    } else {
+                        // No available halls, cancel booking
+                        conflict.status = 'cancelled';
+                        conflict.reassignedInfo = {
+                            oldVenue: venue,
+                            newVenue: null,
+                            reason: `Booking cancelled due to higher priority booking by ${user.role}`,
+                            movedAt: new Date().toISOString()
+                        };
+                    }
+                }
+            });
+        }
         // Prevent overlap booking: same venue, date, and overlapping time
         const overlap = data.bookings.find(b =>
             b.venue === venue &&
@@ -306,7 +383,6 @@ app.post('/api/bookings', (req, res) => {
         if (overlap) {
             return res.status(409).json({ error: `Hall unavailable and already booked for ${venue} on ${date} at ${time}` });
         }
-
         const newBooking = {
             id: newId,
             venue,
@@ -316,17 +392,20 @@ app.post('/api/bookings', (req, res) => {
             organizer,
             email,
             purpose,
-            status: 'pending',
-            createdAt: new Date().toISOString()
+            status: bookingStatus,
+            createdAt: new Date().toISOString(),
+            priority: user && user.role === 'secretary' ? 1
+                : user && user.role === 'principal' ? 2
+                : user && user.role === 'hod' ? 3
+                : user && user.role === 'staff' ? 4
+                : 99 // lowest priority for others
         };
-
         data.bookings.push(newBooking);
-
         if (writeBookings(data)) {
             res.status(201).json({ 
                 success: true, 
                 booking: newBooking,
-                message: 'Booking created successfully'
+                message: bookingStatus === 'confirmed' ? 'Booking auto-approved for secretary or higher priority' : 'Booking created successfully'
             });
         } else {
             res.status(500).json({ error: 'Failed to save booking' });
@@ -468,12 +547,19 @@ app.listen(PORT, () => {
     console.log(`📝 Booking Form: http://localhost:${PORT}/book.html`);
     console.log(`🔐 Login: http://localhost:${PORT}/login.html`);
     console.log('');
-    
     // Validate admin setup
     validateAdminSetup();
     console.log('');
-    console.log('🔐 Admin Access: admin@msec.edu.in / admin@123');
-    console.log('👤 User Access: user@msec.edu.in / user@123');
+    // Print all current users from users.json
+    try {
+        const userData = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+        console.log('� Current User Credentials:');
+        userData.users.forEach(user => {
+            console.log(`- ${user.role.charAt(0).toUpperCase() + user.role.slice(1)}: ${user.email} / ${user.password}`);
+        });
+    } catch (err) {
+        console.error('Error reading users.json:', err);
+    }
 });
 
 module.exports = app;
