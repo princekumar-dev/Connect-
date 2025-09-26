@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venue API Test</title>
+</head>
+<body>
+    <h1>Venue API Test</h1>
+    <div id="results"></div>
+    
+    <script>
+    async function testVenueAPI() {
+        const resultsDiv = document.getElementById('results');
+        
+        try {
+            resultsDiv.innerHTML = '<p>Testing venue API...</p>';
+            
+            const response = await fetch('/api/venues');
+            const venues = await response.json();
+            
+            resultsDiv.innerHTML = `
+                <h2>✅ Venue API Working!</h2>
+                <p><strong>Total venues:</strong> ${venues.length}</p>
+                <h3>Venues List:</h3>
+                <ul>
+                    ${venues.map(venue => `<li>${venue}</li>`).join('')}
+                </ul>
+            `;
+            
+            console.log('Venues from API:', venues);
+            
+        } catch (error) {
+            resultsDiv.innerHTML = `
+                <h2>❌ API Error</h2>
+                <p>Error: ${error.message}</p>
+            `;
+            console.error('Venue API test failed:', error);
+        }
+    }
+    
+    // Test immediately when page loads
+    testVenueAPI();
+    </script>
+</body>
+</html>

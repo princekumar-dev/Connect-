@@ -2,23 +2,23 @@
 
 Short notes to deploy this project to Vercel (serverless functions + static site).
 
-Required environment variables (set these in Vercel Dashboard):
-- MONGODB_URI — MongoDB Atlas connection string
-- CLOUDINARY_CLOUD_NAME — Cloudinary account cloud name (for client-side uploads)
-- CLOUDINARY_UPLOAD_PRESET — unsigned upload preset name
+Required environment variables (set these in Vercel Dashboard -> Settings -> Environment Variables):
+- MONGODB_URI — MongoDB Atlas connection string (must include user/password and DB name)
+- CLOUDINARY_CLOUD_NAME — Cloudinary account cloud name (used by client-side upload)
+- CLOUDINARY_UPLOAD_PRESET — Cloudinary unsigned upload preset (if you use the unsigned client-side flow)
 
-Quick steps:
-1. Move to project root and install deps locally to test: `npm install`.
-2. Confirm your MongoDB Atlas URI and set it in Vercel's Environment Variables.
-3. In Vercel project settings, set the above env vars (CLOUDINARY_* and MONGODB_URI).
-4. Push repository to GitHub and import the project into Vercel.
-5. Vercel will detect the `api/` directory and build Node serverless functions.
+Quick Vercel deployment checklist:
+1. Create a GitHub repo and push this project.
+2. Import the GitHub repo into Vercel (https://vercel.com/new).
+3. In Vercel project Settings -> Environment Variables, add the three variables above. For production, prefer server-side signed uploads (see next steps).
+4. Ensure `vercel.json` is present (this repo already includes one).
+5. Deploy — Vercel will run the `vercel-build` script from `package.json` (this project uses a no-op build script because it serves static files + serverless functions).
 
-Notes:
-- This repo converts the Express endpoints into serverless `api/*` functions. The legacy `server.js` remains for local/dev use, but Vercel will route `/api/*` to the functions instead.
-- The Events upload now expects an image URL (uploaded to Cloudinary). The client-side `events.html` includes a Cloudinary upload flow using `CLOUDINARY_CLOUD_NAME` and `CLOUDINARY_UPLOAD_PRESET`.
+Notes and recommendations:
+- The repository includes both a legacy `server.js` (for local/dev runs) and `api/` serverless handlers for Vercel. When deployed to Vercel, the `api/` functions will handle API routes under `/api/*`. You can keep `server.js` for local development, but it is not used by Vercel.
+- Currently `events.html` uploads images directly to Cloudinary using an unsigned preset and then sends the image URL to the server. For production security, I recommend replacing that with a signed upload flow (server generates a short-lived signature). I can implement that for you.
 
-If you want me to finish the final polish (add Cloudinary instructions, secure uploads server-side, or fully remove `server.js`), tell me which option you prefer.
+If you want me to implement signed uploads, harden authentication, or remove `server.js` and convert everything to serverless, pick one and I'll proceed.
 # MSEC Connect - Venue Booking System
 
 A complete venue booking system with backend server and admin dashboard.
