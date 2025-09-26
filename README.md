@@ -1,3 +1,24 @@
+# MSEC Connect — Vercel Deployment Notes
+
+Short notes to deploy this project to Vercel (serverless functions + static site).
+
+Required environment variables (set these in Vercel Dashboard):
+- MONGODB_URI — MongoDB Atlas connection string
+- CLOUDINARY_CLOUD_NAME — Cloudinary account cloud name (for client-side uploads)
+- CLOUDINARY_UPLOAD_PRESET — unsigned upload preset name
+
+Quick steps:
+1. Move to project root and install deps locally to test: `npm install`.
+2. Confirm your MongoDB Atlas URI and set it in Vercel's Environment Variables.
+3. In Vercel project settings, set the above env vars (CLOUDINARY_* and MONGODB_URI).
+4. Push repository to GitHub and import the project into Vercel.
+5. Vercel will detect the `api/` directory and build Node serverless functions.
+
+Notes:
+- This repo converts the Express endpoints into serverless `api/*` functions. The legacy `server.js` remains for local/dev use, but Vercel will route `/api/*` to the functions instead.
+- The Events upload now expects an image URL (uploaded to Cloudinary). The client-side `events.html` includes a Cloudinary upload flow using `CLOUDINARY_CLOUD_NAME` and `CLOUDINARY_UPLOAD_PRESET`.
+
+If you want me to finish the final polish (add Cloudinary instructions, secure uploads server-side, or fully remove `server.js`), tell me which option you prefer.
 # MSEC Connect - Venue Booking System
 
 A complete venue booking system with backend server and admin dashboard.

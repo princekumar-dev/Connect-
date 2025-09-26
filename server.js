@@ -1,137 +1,136 @@
-// ...existing code...
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
 const cors = require('cors');
+const connectDB = require('./db');
+const { User, Event, Booking } = require('./models');
+require('dotenv').config();
 
 const app = express();
-const PORT = 3000; // Changed default port to 3000
+const PORT = process.env.PORT || 3000;
+
+// Connect to MongoDB
+connectDB();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+// Increase JSON body size to allow large DataURL image uploads from the client (events upload sends base64 image)
+// Set higher limit to accommodate common image sizes when sent as base64 in JSON (temporary for dev)
+app.use(express.json({ limit: '50mb' }));
+
+// Venue capacity mapping (restricted to allowed halls for booking form)
+const VENUE_CAPACITIES = {
+    'KRS Seminar Hall': 50,
+    'Civil Seminar Hall': 75,
+    'ECE Seminar Hall': 100,
+    'MS Auditorium': 500
+};
+
+// Get recommended venues based on attendee count
+function getRecommendedVenues(attendees) {
+    const venues = [];
+    for (const [venue, capacity] of Object.entries(VENUE_CAPACITIES)) {
+        if (capacity >= attendees) {
+            venues.push({ venue, capacity, suitable: true });
+        } else {
+            venues.push({ venue, capacity, suitable: false });
+        }
+    }
+    // Sort by capacity (suitable venues first, then by capacity ascending)
+    return venues.sort((a, b) => {
+        if (a.suitable && !b.suitable) return -1;
+        if (!a.suitable && b.suitable) return 1;
+        return a.capacity - b.capacity;
+    });
+}
 
 // API routes should come before static file serving
 // (Static middleware will be added after API routes)
 
-// File paths for data storage
-const BOOKINGS_FILE = path.join(__dirname, 'bookings.json');
-const USERS_FILE = path.join(__dirname, 'users.json');
-const EVENTS_FILE = path.join(__dirname, 'events.json');
-
-// Initialize data files if they don't exist
-if (!fs.existsSync(USERS_FILE)) {
-    const initialUsers = {
-        users: [
-            { id: 1, email: 'admin@msec.edu.in', password: 'admin@123', name: 'Administrator', role: 'admin' },
-            { id: 2, email: 'staff@msec.edu.in', password: 'staff@123', name: 'Staff', role: 'staff' },
-            { id: 3, email: 'hod@msec.edu.in', password: 'hod@123', name: 'HOD', role: 'hod' },
-            { id: 4, email: 'principal2msec.edu.in', password: 'principal@123', name: 'Principal', role: 'principal' },
-            { id: 5, email: 'secretary@msec.edu.in', password: 'secretary@123', name: 'Secretary', role: 'secretary' }
-        ]
-    };
-    fs.writeFileSync(USERS_FILE, JSON.stringify(initialUsers, null, 2));
-}
-
-if (!fs.existsSync(BOOKINGS_FILE)) {
-    const initialBookings = {
-        bookings: []
-    };
-    fs.writeFileSync(BOOKINGS_FILE, JSON.stringify(initialBookings, null, 2));
-}
-
-if (!fs.existsSync(EVENTS_FILE)) {
-    const initialEvents = {
-        events: []
-    };
-    fs.writeFileSync(EVENTS_FILE, JSON.stringify(initialEvents, null, 2));
-}
-
-// Helper functions
-function readBookings() {
+// Initialize default users if collection is empty
+async function initializeUsers() {
     try {
-        const data = fs.readFileSync(BOOKINGS_FILE, 'utf8');
-        return JSON.parse(data);
+        const userCount = await User.countDocuments();
+        if (userCount === 0) {
+            const initialUsers = [
+                { id: 1, email: 'admin@msec.edu.in', password: 'admin@123', name: 'Administrator', role: 'admin' },
+                { id: 2, email: 'staff@msec.edu.in', password: 'staff@123', name: 'Staff', role: 'staff' },
+                { id: 3, email: 'hod@msec.edu.in', password: 'hod@123', name: 'HOD', role: 'hod' },
+                { id: 4, email: 'principal@msec.edu.in', password: 'principal@123', name: 'Principal', role: 'principal' },
+                { id: 5, email: 'secretary@msec.edu.in', password: 'secretary@123', name: 'Secretary', role: 'secretary' }
+            ];
+            await User.insertMany(initialUsers);
+            console.log('Default users initialized');
+        }
+    } catch (error) {
+        console.error('Error initializing users:', error);
+    }
+}
+
+// Call initialization
+initializeUsers();
+
+// Helper functions for MongoDB operations
+async function getAllBookings() {
+    try {
+        return await Booking.find({});
     } catch (error) {
         console.error('Error reading bookings:', error);
-        return { bookings: [] };
+        return [];
     }
 }
 
-function readEvents() {
+async function getAllEvents() {
     try {
-        const data = fs.readFileSync(EVENTS_FILE, 'utf8');
-        return JSON.parse(data);
+        return await Event.find({});
     } catch (error) {
         console.error('Error reading events:', error);
-        return { events: [] };
+        return [];
     }
 }
 
-function writeEvents(data) {
+async function getAllUsers() {
     try {
-        fs.writeFileSync(EVENTS_FILE, JSON.stringify(data, null, 2));
-        return true;
-    } catch (error) {
-        console.error('Error writing events:', error);
-        return false;
-    }
-}
-
-function writeBookings(data) {
-    try {
-        fs.writeFileSync(BOOKINGS_FILE, JSON.stringify(data, null, 2));
-        return true;
-    } catch (error) {
-        console.error('Error writing bookings:', error);
-        return false;
-    }
-}
-
-function readUsers() {
-    try {
-        const data = fs.readFileSync(USERS_FILE, 'utf8');
-        return JSON.parse(data);
+        return await User.find({});
     } catch (error) {
         console.error('Error reading users:', error);
-        return { users: [] };
+        return [];
     }
 }
 
 // Middleware to verify admin access
-function verifyAdmin(req, res, next) {
-    console.log('Headers received:', req.headers);
-    const { userEmail } = req.headers;
-    const userEmailLower = req.headers.useremail;
-    const userEmailCapital = req.headers.UserEmail;
-    
-    console.log('Header variations:', { userEmail, userEmailLower, userEmailCapital });
-    
-    const actualUserEmail = userEmail || userEmailLower || userEmailCapital;
-    
-    if (!actualUserEmail) {
-        console.log('Admin verification failed: No user email provided');
-        console.log('Available headers:', Object.keys(req.headers));
-        return res.status(401).json({ error: 'User email is required' });
+async function verifyAdmin(req, res, next) {
+    try {
+        // Read header in a tolerant way (headers are lowercased in Node)
+        const headerEmail = req.get('userEmail') || req.get('user-email') || req.get('useremail') || req.headers['useremail'] || req.headers['user-email'];
+        const actualUserEmail = headerEmail ? String(headerEmail).trim() : null;
+
+        console.log('verifyAdmin: header user email:', actualUserEmail);
+
+        if (!actualUserEmail) {
+            console.log('Admin verification failed: No user email provided');
+            console.log('Available headers:', Object.keys(req.headers));
+            return res.status(401).json({ error: 'User email is required' });
+        }
+
+        // Explicit check for admin email
+        if (actualUserEmail.toLowerCase() !== 'admin@msec.edu.in') {
+            console.log('Admin verification failed: User is not admin:', actualUserEmail);
+            return res.status(403).json({ error: 'Admin access required. Only admin@msec.edu.in is authorized.' });
+        }
+
+        const user = await User.findOne({ email: actualUserEmail, role: 'admin' });
+
+        if (!user) {
+            console.log('Admin verification failed: User not found in database or role mismatch:', actualUserEmail);
+            return res.status(403).json({ error: 'Admin access required. User not found or insufficient privileges.' });
+        }
+
+        console.log('Admin verification successful for:', actualUserEmail);
+        req.user = user;
+        next();
+    } catch (error) {
+        console.error('Error in admin verification:', error);
+        return res.status(500).json({ error: 'Internal server error' });
     }
-    
-    // Explicit check for admin email
-    if (actualUserEmail !== 'admin@msec.edu.in') {
-        console.log('Admin verification failed: User is not admin:', actualUserEmail);
-        return res.status(403).json({ error: 'Admin access required. Only admin@msec.edu.in is authorized.' });
-    }
-    
-    const userData = readUsers();
-    const user = userData.users.find(u => u.email === actualUserEmail && u.role === 'admin');
-    
-    if (!user) {
-        console.log('Admin verification failed: User not found in database or role mismatch:', actualUserEmail);
-        return res.status(403).json({ error: 'Admin access required. User not found or insufficient privileges.' });
-    }
-    
-    console.log('Admin verification successful for:', actualUserEmail);
-    req.user = user;
-    next();
 }
 
 // Health check endpoint
@@ -144,48 +143,107 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// Get recommended venues based on attendee count
+app.get('/api/venues/recommend/:attendees', (req, res) => {
+    try {
+        const attendees = parseInt(req.params.attendees);
+        if (!attendees || attendees <= 0) {
+            return res.status(400).json({ error: 'Valid attendee count is required' });
+        }
+        
+        const recommendedVenues = getRecommendedVenues(attendees);
+        res.json({ 
+            success: true, 
+            attendees: attendees,
+            venues: recommendedVenues,
+            count: recommendedVenues.length
+        });
+    } catch (error) {
+        console.error('Error getting recommended venues:', error);
+        res.status(500).json({ error: 'Failed to get venue recommendations' });
+    }
+});
+
+// Get all venues with capacities
+app.get('/api/venues', (req, res) => {
+    try {
+        const venues = Object.entries(VENUE_CAPACITIES).map(([venue, capacity]) => ({
+            venue,
+            capacity
+        }));
+        res.json({ 
+            success: true, 
+            venues: venues,
+            count: venues.length
+        });
+    } catch (error) {
+        console.error('Error getting venues:', error);
+        res.status(500).json({ error: 'Failed to get venues' });
+    }
+});
+
 // Get all events
 // Remove event (admin only)
-app.delete('/api/event/:id', verifyAdmin, (req, res) => {
+app.delete('/api/event/:id', verifyAdmin, async (req, res) => {
     try {
         const eventId = parseInt(req.params.id);
         if (!eventId) {
             return res.status(400).json({ error: 'Invalid event ID' });
         }
-        const data = readEvents();
-        const eventIndex = data.events.findIndex(e => e.id === eventId);
-        if (eventIndex === -1) {
+        
+        const deletedEvent = await Event.findOneAndDelete({ id: eventId });
+        if (!deletedEvent) {
             return res.status(404).json({ error: 'Event not found' });
         }
-        data.events.splice(eventIndex, 1);
-        if (writeEvents(data)) {
-            res.json({ success: true, message: 'Event removed successfully' });
-        } else {
-            res.status(500).json({ error: 'Failed to remove event' });
-        }
+        
+        res.json({ success: true, message: 'Event removed successfully' });
     } catch (error) {
+        console.error('Error removing event:', error);
         res.status(500).json({ error: 'Failed to remove event' });
     }
 });
-app.get('/api/event', (req, res) => {
+
+// Get all events
+app.get('/api/event', async (req, res) => {
     try {
-        const data = readEvents();
-        res.json({ success: true, events: data.events, count: data.events.length });
+        const events = await Event.find({});
+        res.json({ success: true, events: events, count: events.length });
     } catch (error) {
+        console.error('Error fetching events:', error);
         res.status(500).json({ error: 'Failed to fetch events' });
     }
 });
 
 // Create new event (admin only)
-app.post('/api/event', verifyAdmin, (req, res) => {
+app.post('/api/event', verifyAdmin, async (req, res) => {
     try {
         const { name, date, time, desc, image } = req.body;
         if (!name || !date || !time || !desc || !image) {
             return res.status(400).json({ error: 'All fields are required' });
         }
-        const data = readEvents();
-        const newId = Math.max(...data.events.map(e => e.id || 0), 0) + 1;
-        const newEvent = {
+
+        // If image is a data URL (base64), check its size before attempting to save
+        // Data URLs look like: data:image/png;base64,AAAA...
+        if (typeof image === 'string' && image.startsWith('data:')) {
+            try {
+                const base64Part = image.split(',')[1] || '';
+                // Length in bytes ~ (base64 length * 3/4)
+                const approxBytes = Math.ceil((base64Part.length * 3) / 4);
+                const MAX_BYTES = 15 * 1024 * 1024; // 15MB
+                if (approxBytes > MAX_BYTES) {
+                    console.warn('Uploaded event image too large:', `${approxBytes} bytes`);
+                    return res.status(413).json({ error: 'Uploaded image is too large. Please use a smaller image (max 15MB).' });
+                }
+            } catch (err) {
+                console.warn('Could not parse image data for size check', err);
+            }
+        }
+        
+        // Get the highest id and increment
+        const lastEvent = await Event.findOne({}, {}, { sort: { 'id': -1 } });
+        const newId = lastEvent ? lastEvent.id + 1 : 1;
+        
+        const newEvent = new Event({
             id: newId,
             name,
             date,
@@ -193,82 +251,64 @@ app.post('/api/event', verifyAdmin, (req, res) => {
             desc,
             image,
             createdAt: new Date().toISOString()
-        };
-        data.events.push(newEvent);
-        if (writeEvents(data)) {
-            res.status(201).json({ success: true, event: newEvent, message: 'Event uploaded successfully' });
-        } else {
-            res.status(500).json({ error: 'Failed to save event' });
-        }
+        });
+        
+        const savedEvent = await newEvent.save();
+        res.status(201).json({ success: true, event: savedEvent, message: 'Event uploaded successfully' });
     } catch (error) {
+        console.error('Error creating event:', error);
         res.status(500).json({ error: 'Failed to upload event' });
     }
 });
 
 // Authentication endpoint
-app.post('/api/login', (req, res) => {
-    const { email, password } = req.body;
-    
-    if (!email || !password) {
-        return res.status(400).json({ error: 'Email and password are required' });
+app.post('/api/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email and password are required' });
+        }
+        
+        const user = await User.findOne({ email, password });
+        
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+        
+        // Return user data without password
+        const { password: _, ...userWithoutPassword } = user.toObject();
+        res.json({ 
+            success: true, 
+            user: userWithoutPassword,
+            message: `Welcome ${user.name}!`
+        });
+    } catch (error) {
+        console.error('Error during login:', error);
+        res.status(500).json({ error: 'Login failed' });
     }
-    
-    const userData = readUsers();
-    const user = userData.users.find(u => u.email === email && u.password === password);
-    
-    if (!user) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-    }
-    
-    // Return user data without password
-    const { password: _, ...userWithoutPassword } = user;
-    res.json({ 
-        success: true, 
-        user: userWithoutPassword,
-        message: `Welcome ${user.name}!`
-    });
 });
 
 // Get all bookings (admin only)
-app.get('/api/bookings', verifyAdmin, (req, res) => {
+app.get('/api/bookings', verifyAdmin, async (req, res) => {
     try {
-        const data = readBookings();
-        // Priority order: secretary > principal > hod > staff
-        const priorityOrder = ['secretary', 'principal', 'hod', 'staff'];
-        const users = readUsers().users;
-        // Helper to get role for booking
-        function getRole(email) {
-            const user = users.find(u => u.email === email);
-            return user ? user.role : '';
-        }
-        // Sort bookings by priority
-        const sortedBookings = [...data.bookings].sort((a, b) => {
-            const roleA = getRole(a.email);
-            const roleB = getRole(b.email);
-            const idxA = priorityOrder.indexOf(roleA);
-            const idxB = priorityOrder.indexOf(roleB);
-            // Lower index = higher priority
-            if (idxA === -1 && idxB === -1) return 0;
-            if (idxA === -1) return 1;
-            if (idxB === -1) return -1;
-            return idxA - idxB;
-        });
+        const bookings = await Booking.find({}).sort({ priority: 1 });
         res.json({ 
             success: true, 
-            bookings: sortedBookings,
-            count: sortedBookings.length
+            bookings: bookings,
+            count: bookings.length
         });
     } catch (error) {
+        console.error('Error fetching bookings:', error);
         res.status(500).json({ error: 'Failed to fetch bookings' });
     }
 });
 
 // Get bookings by status (admin only)
-app.get('/api/bookings/status/:status', verifyAdmin, (req, res) => {
+app.get('/api/bookings/status/:status', verifyAdmin, async (req, res) => {
     try {
         const { status } = req.params;
-        const data = readBookings();
-        const filteredBookings = data.bookings.filter(booking => booking.status === status);
+        const filteredBookings = await Booking.find({ status: status });
         
         res.json({ 
             success: true, 
@@ -277,12 +317,13 @@ app.get('/api/bookings/status/:status', verifyAdmin, (req, res) => {
             status: status
         });
     } catch (error) {
+        console.error('Error fetching bookings by status:', error);
         res.status(500).json({ error: 'Failed to fetch bookings' });
     }
 });
 
 // Get user's own bookings (for regular users)
-app.get('/api/user/bookings', (req, res) => {
+app.get('/api/user/bookings', async (req, res) => {
     try {
         const userEmail = req.headers.useremail || req.headers.userEmail || req.headers['user-email'];
         
@@ -290,10 +331,9 @@ app.get('/api/user/bookings', (req, res) => {
             return res.status(401).json({ error: 'User email required' });
         }
         
-        const data = readBookings();
-        const userBookings = data.bookings.filter(booking => 
-            booking.email && booking.email.toLowerCase() === userEmail.toLowerCase()
-        );
+        const userBookings = await Booking.find({ 
+            email: { $regex: new RegExp(userEmail, 'i') }
+        });
         
         res.json({ 
             success: true, 
@@ -302,88 +342,121 @@ app.get('/api/user/bookings', (req, res) => {
             userEmail: userEmail
         });
     } catch (error) {
+        console.error('Error fetching user bookings:', error);
         res.status(500).json({ error: 'Failed to fetch user bookings' });
     }
 });
 
 // Create new booking
-app.post('/api/bookings', (req, res) => {
+app.post('/api/bookings', async (req, res) => {
     try {
-        const { venue, date, time, attendees, organizer, email, purpose } = req.body;
+        const { venue, date, time, attendees, organizer, email, purpose, purposeCategory } = req.body;
         // Validate required fields
         if (!venue || !date || !time || !attendees || !organizer || !email || !purpose) {
             return res.status(400).json({ error: 'All fields are required' });
         }
-        const data = readBookings();
-        const newId = Math.max(...data.bookings.map(b => b.id), 0) + 1;
-        // Get user role from users.json
-        const users = readUsers().users;
-        const user = users.find(u => u.email === email);
-        // Priority mapping
+
+        // Validate purpose category
+        const validCategories = ['Alumni Talk', 'Workshop', 'Seminar', 'Events', 'Other'];
+        const finalPurposeCategory = purposeCategory && validCategories.includes(purposeCategory) ? purposeCategory : 'Other';
+
+        // Get the highest id and increment
+        const lastBooking = await Booking.findOne({}, {}, { sort: { 'id': -1 } });
+        const newId = lastBooking ? lastBooking.id + 1 : 1;
+        
+        // Get user role from MongoDB
+        const user = await User.findOne({ email: email });
+        
+        // Updated Priority mapping and auto-approval logic
         const priorityMap = { secretary: 1, principal: 2, hod: 3, staff: 4 };
         const userPriority = user && priorityMap[user.role] ? priorityMap[user.role] : 99;
         let bookingStatus = 'pending';
+        let approvedBy = null;
+        let approvalDate = null;
+        
+        // New Priority Rules:
+        // Secretary: Auto-approve (priority 1)
+        // Principal: Auto-approve (priority 2) 
+        // HOD: Manual approval by admin (priority 3)
+        // Staff: Manual approval by admin (priority 4)
+        if (user && (user.role === 'secretary' || user.role === 'principal')) {
+            bookingStatus = 'confirmed';
+            approvedBy = 'auto-approved';
+            approvalDate = new Date().toISOString();
+        }
+        // HOD and Staff require manual admin approval
+        else if (user && (user.role === 'hod' || user.role === 'staff')) {
+            bookingStatus = 'pending'; // Will remain pending until admin approval
+        }
+        
         // Find all bookings for same venue/date/time
-        const conflictingBookings = data.bookings.filter(b =>
-            b.venue === venue &&
-            b.date === date &&
-            b.time === time &&
-            b.status !== 'cancelled'
-        );
+        const conflictingBookings = await Booking.find({
+            venue: venue,
+            date: date,
+            time: time,
+            status: { $ne: 'cancelled' }
+        });
+        
         // Check if any higher priority booking exists
         const higherExists = conflictingBookings.some(b => b.priority && b.priority < userPriority);
-        if (userPriority === 1 || !higherExists) {
-            bookingStatus = 'confirmed'; // Auto-approve if secretary or no higher priority exists
+        
+        // Only auto-approve if secretary/principal AND no higher priority conflicts
+        if (bookingStatus === 'confirmed' && higherExists) {
+            bookingStatus = 'pending'; // Demote to pending if conflicts exist
+            approvedBy = null;
+            approvalDate = null;
         }
+        
         // If this booking is higher priority than any conflicting booking, move lower priority bookings
         if (conflictingBookings.length > 0 && bookingStatus === 'confirmed') {
             // Get all halls (venues) from existing bookings and a static list
             const allVenues = [
                 'Main Hall', 'Conference Room', 'Auditorium', 'Seminar Hall', 'Lecture Hall 1', 'Lecture Hall 2', 'Lecture Hall 3', 'Lecture Hall 4'
             ];
-            conflictingBookings.forEach(conflict => {
+            
+            for (const conflict of conflictingBookings) {
                 if (conflict.priority > userPriority) {
                     // Find an available hall for the lower priority booking
-                    const bookedVenues = data.bookings.filter(b =>
-                        b.date === conflict.date &&
-                        b.time === conflict.time &&
-                        b.status !== 'cancelled'
-                    ).map(b => b.venue);
-                    const availableVenues = allVenues.filter(v => !bookedVenues.includes(v));
+                    const bookedVenues = await Booking.find({
+                        date: conflict.date,
+                        time: conflict.time,
+                        status: { $ne: 'cancelled' }
+                    }).select('venue');
+                    
+                    const bookedVenueNames = bookedVenues.map(b => b.venue);
+                    const availableVenues = allVenues.filter(v => !bookedVenueNames.includes(v));
+                    
                     if (availableVenues.length > 0) {
                         // Move booking to first available hall
+                        conflict.originalVenue = conflict.venue;
                         conflict.venue = availableVenues[0];
                         conflict.status = 'reassigned';
-                        conflict.reassignedInfo = {
-                            oldVenue: venue,
-                            newVenue: availableVenues[0],
-                            reason: `Booking moved due to higher priority booking by ${user.role}`,
-                            movedAt: new Date().toISOString()
-                        };
+                        conflict.movedReason = `Booking moved due to higher priority booking by ${user.role}`;
+                        await conflict.save();
                     } else {
                         // No available halls, cancel booking
+                        conflict.originalVenue = conflict.venue;
                         conflict.status = 'cancelled';
-                        conflict.reassignedInfo = {
-                            oldVenue: venue,
-                            newVenue: null,
-                            reason: `Booking cancelled due to higher priority booking by ${user.role}`,
-                            movedAt: new Date().toISOString()
-                        };
+                        conflict.movedReason = `Booking cancelled due to higher priority booking by ${user.role}`;
+                        await conflict.save();
                     }
                 }
-            });
+            }
         }
+        
         // Prevent overlap booking: same venue, date, and overlapping time
-        const overlap = data.bookings.find(b =>
-            b.venue === venue &&
-            b.date === date &&
-            b.status !== 'cancelled' &&
-            b.time === time
-        );
+        const overlap = await Booking.findOne({
+            venue: venue,
+            date: date,
+            time: time,
+            status: { $ne: 'cancelled' }
+        });
+        
         if (overlap) {
             return res.status(409).json({ error: `Hall unavailable and already booked for ${venue} on ${date} at ${time}` });
         }
-        const newBooking = {
+        
+        const newBooking = new Booking({
             id: newId,
             venue,
             date,
@@ -392,31 +465,47 @@ app.post('/api/bookings', (req, res) => {
             organizer,
             email,
             purpose,
+            purposeCategory: finalPurposeCategory,
             status: bookingStatus,
             createdAt: new Date().toISOString(),
             priority: user && user.role === 'secretary' ? 1
                 : user && user.role === 'principal' ? 2
                 : user && user.role === 'hod' ? 3
                 : user && user.role === 'staff' ? 4
-                : 99 // lowest priority for others
-        };
-        data.bookings.push(newBooking);
-        if (writeBookings(data)) {
-            res.status(201).json({ 
-                success: true, 
-                booking: newBooking,
-                message: bookingStatus === 'confirmed' ? 'Booking auto-approved for secretary or higher priority' : 'Booking created successfully'
-            });
-        } else {
-            res.status(500).json({ error: 'Failed to save booking' });
+                : 99, // lowest priority for others
+            venueCapacity: VENUE_CAPACITIES[venue] || null,
+            approvedBy: approvedBy,
+            approvalDate: approvalDate
+        });
+        
+        const savedBooking = await newBooking.save();
+        
+        let message = 'Booking created successfully';
+        if (bookingStatus === 'confirmed') {
+            if (user.role === 'secretary') {
+                message = 'Booking auto-approved for Secretary';
+            } else if (user.role === 'principal') {
+                message = 'Booking auto-approved for Principal';
+            }
+        } else if (user && (user.role === 'hod' || user.role === 'staff')) {
+            message = 'Booking submitted for admin approval';
         }
+        
+        res.status(201).json({ 
+            success: true, 
+            booking: savedBooking,
+            message: message,
+            autoApproved: bookingStatus === 'confirmed',
+            requiresApproval: user && (user.role === 'hod' || user.role === 'staff')
+        });
     } catch (error) {
+        console.error('Error creating booking:', error);
         res.status(500).json({ error: 'Failed to create booking' });
     }
 });
 
 // Update booking status (admin only)
-app.patch('/api/bookings/:id/status', verifyAdmin, (req, res) => {
+app.patch('/api/bookings/:id/status', verifyAdmin, async (req, res) => {
     try {
         const { id } = req.params;
         const { status } = req.body;
@@ -425,70 +514,79 @@ app.patch('/api/bookings/:id/status', verifyAdmin, (req, res) => {
             return res.status(400).json({ error: 'Valid status is required (pending, confirmed, cancelled)' });
         }
         
-        const data = readBookings();
-        const bookingIndex = data.bookings.findIndex(b => b.id === parseInt(id));
+        const updateFields = { 
+            status: status,
+            updatedAt: new Date().toISOString()
+        };
         
-        if (bookingIndex === -1) {
+        // If admin is approving a booking, record the approval details
+        if (status === 'confirmed') {
+            updateFields.approvedBy = req.user.email;
+            updateFields.approvalDate = new Date().toISOString();
+        }
+        
+        const booking = await Booking.findOneAndUpdate(
+            { id: parseInt(id) },
+            updateFields,
+            { new: true }
+        );
+        
+        if (!booking) {
             return res.status(404).json({ error: 'Booking not found' });
         }
         
-        data.bookings[bookingIndex].status = status;
-        data.bookings[bookingIndex].updatedAt = new Date().toISOString();
-        
-        if (writeBookings(data)) {
-            res.json({ 
-                success: true, 
-                booking: data.bookings[bookingIndex],
-                message: `Booking status updated to ${status}`
-            });
-        } else {
-            res.status(500).json({ error: 'Failed to update booking' });
+        let message = `Booking status updated to ${status}`;
+        if (status === 'confirmed') {
+            message = `Booking approved by admin (${req.user.email})`;
+        } else if (status === 'cancelled') {
+            message = `Booking cancelled by admin (${req.user.email})`;
         }
+        
+        res.json({ 
+            success: true, 
+            booking: booking,
+            message: message
+        });
     } catch (error) {
+        console.error('Error updating booking status:', error);
         res.status(500).json({ error: 'Failed to update booking status' });
     }
 });
 
 // Delete booking (admin only)
-app.delete('/api/bookings/:id', verifyAdmin, (req, res) => {
+app.delete('/api/bookings/:id', verifyAdmin, async (req, res) => {
     try {
         const { id } = req.params;
-        const data = readBookings();
-        const bookingIndex = data.bookings.findIndex(b => b.id === parseInt(id));
+        const deletedBooking = await Booking.findOneAndDelete({ id: parseInt(id) });
         
-        if (bookingIndex === -1) {
+        if (!deletedBooking) {
             return res.status(404).json({ error: 'Booking not found' });
         }
         
-        const deletedBooking = data.bookings.splice(bookingIndex, 1)[0];
-        
-        if (writeBookings(data)) {
-            res.json({ 
-                success: true, 
-                booking: deletedBooking,
-                message: 'Booking deleted successfully'
-            });
-        } else {
-            res.status(500).json({ error: 'Failed to delete booking' });
-        }
+        res.json({ 
+            success: true, 
+            booking: deletedBooking,
+            message: 'Booking deleted successfully'
+        });
     } catch (error) {
+        console.error('Error deleting booking:', error);
         res.status(500).json({ error: 'Failed to delete booking' });
     }
 });
 
 // Get booking statistics (admin only)
-app.get('/api/bookings/stats', verifyAdmin, (req, res) => {
+app.get('/api/bookings/stats', verifyAdmin, async (req, res) => {
     try {
-        const data = readBookings();
-        const stats = {
-            total: data.bookings.length,
-            confirmed: data.bookings.filter(b => b.status === 'confirmed').length,
-            pending: data.bookings.filter(b => b.status === 'pending').length,
-            cancelled: data.bookings.filter(b => b.status === 'cancelled').length
-        };
+        const total = await Booking.countDocuments();
+        const confirmed = await Booking.countDocuments({ status: 'confirmed' });
+        const pending = await Booking.countDocuments({ status: 'pending' });
+        const cancelled = await Booking.countDocuments({ status: 'cancelled' });
+        
+        const stats = { total, confirmed, pending, cancelled };
         
         res.json({ success: true, stats });
     } catch (error) {
+        console.error('Error fetching statistics:', error);
         res.status(500).json({ error: 'Failed to fetch statistics' });
     }
 });
@@ -503,62 +601,56 @@ app.use((error, req, res, next) => {
 });
 
 // Validate admin user setup
-function validateAdminSetup() {
-    const userData = readUsers();
-    const adminUser = userData.users.find(u => u.email === 'admin@msec.edu.in');
-    
-    if (!adminUser) {
-        console.error('❌ Admin user not found! Creating admin user...');
-        userData.users.push({
-            id: userData.users.length + 1,
-            email: 'admin@msec.edu.in',
-            password: 'admin@123',
-            name: 'Administrator',
-            role: 'admin'
-        });
-        fs.writeFileSync(USERS_FILE, JSON.stringify(userData, null, 2));
-        console.log('✅ Admin user created successfully');
-    } else if (adminUser.role !== 'admin') {
-        console.error('❌ Admin user role mismatch! Fixing...');
-        adminUser.role = 'admin';
-        fs.writeFileSync(USERS_FILE, JSON.stringify(userData, null, 2));
-        console.log('✅ Admin user role fixed');
-    } else {
-        console.log('✅ Admin user verified: admin@msec.edu.in');
-    }
-    
-    // Ensure no other users have admin role
-    const otherAdmins = userData.users.filter(u => u.email !== 'admin@msec.edu.in' && u.role === 'admin');
-    if (otherAdmins.length > 0) {
-        console.warn('⚠️  Found other users with admin role, removing admin privileges...');
-        otherAdmins.forEach(user => {
-            user.role = 'user';
-            console.log(`   - Removed admin role from: ${user.email}`);
-        });
-        fs.writeFileSync(USERS_FILE, JSON.stringify(userData, null, 2));
-        console.log('✅ Admin privileges secured for admin@msec.edu.in only');
+async function validateAdminSetup() {
+    try {
+        const adminUser = await User.findOne({ email: 'admin@msec.edu.in' });
+        
+        if (!adminUser) {
+            console.error('❌ Admin user not found in MongoDB! Should be created by initializeUsers()');
+        } else if (adminUser.role !== 'admin') {
+            console.error('❌ Admin user role mismatch! Fixing...');
+            adminUser.role = 'admin';
+            await adminUser.save();
+            console.log('✅ Admin user role fixed');
+        } else {
+            console.log('✅ Admin user verified: admin@msec.edu.in');
+        }
+        
+        // Ensure no other users have admin role
+        const otherAdmins = await User.find({ email: { $ne: 'admin@msec.edu.in' }, role: 'admin' });
+        if (otherAdmins.length > 0) {
+            console.warn('⚠️  Found other users with admin role, removing admin privileges...');
+            for (const user of otherAdmins) {
+                user.role = 'user';
+                await user.save();
+                console.log(`   - Removed admin role from: ${user.email}`);
+            }
+            console.log('✅ Admin privileges secured for admin@msec.edu.in only');
+        }
+    } catch (error) {
+        console.error('Error validating admin setup:', error);
     }
 }
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     console.log(`🚀 MSEC Connect Backend Server running on http://localhost:${PORT}`);
     console.log(`📊 Admin Dashboard: http://localhost:${PORT}/bookings.html`);
     console.log(`📝 Booking Form: http://localhost:${PORT}/book.html`);
     console.log(`🔐 Login: http://localhost:${PORT}/login.html`);
     console.log('');
     // Validate admin setup
-    validateAdminSetup();
+    await validateAdminSetup();
     console.log('');
-    // Print all current users from users.json
+    // Print all current users from MongoDB
     try {
-        const userData = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
-        console.log('� Current User Credentials:');
-        userData.users.forEach(user => {
+        const users = await User.find({});
+        console.log('👥 Current User Credentials:');
+        users.forEach(user => {
             console.log(`- ${user.role.charAt(0).toUpperCase() + user.role.slice(1)}: ${user.email} / ${user.password}`);
         });
     } catch (err) {
-        console.error('Error reading users.json:', err);
+        console.error('Error reading users from MongoDB:', err);
     }
 });
 

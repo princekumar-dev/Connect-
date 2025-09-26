@@ -1,4 +1,4 @@
-<html>
+﻿<html>
   <head>
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
     <link
@@ -391,11 +391,6 @@
                 <p class="text-[#60758a] text-base font-semibold leading-normal">Purpose</p>
                 <p id="summaryPurpose" class="text-[#111418] text-base font-normal leading-normal">Please enter purpose</p>
               </div>
-              <!-- Purpose Category (new) -->
-              <div class="col-span-2 grid grid-cols-subgrid border-t border-t-[#dbe0e6] py-6">
-                <p class="text-[#60758a] text-base font-semibold leading-normal">Category</p>
-                <p id="summaryCategory" class="text-[#111418] text-base font-normal leading-normal">Please select a category</p>
-              </div>
             </div>
             <!-- Success Message Container -->
             <div id="successMessage" class="hidden mx-4 mb-6 p-6 bg-green-50 border border-green-200 rounded-xl">
@@ -620,8 +615,6 @@
           var selectElement = document.getElementById('hallSelect');
           if (selectElement) {
             selectElement.value = hallName;
-            // ensure summary updates when prefilled
-            updateBookingSummary();
           }
         }
         
@@ -657,27 +650,9 @@
       }
     });
   }
-  // Ensure changing hall updates booking summary (extra guard in case other setup runs earlier)
-  const hallSelectEl = document.getElementById('hallSelect');
-  if (hallSelectEl) {
-    hallSelectEl.addEventListener('change', updateBookingSummary);
-  }
       });
       
-        // Ensure change handlers are attached (in case dropdown was rebuilt)
-        if (!hallSelect._summaryListenerAttached) {
-          hallSelect.addEventListener('change', function() {
-            // Update booking summary and availability when selection changes
-            try { updateBookingSummary(); } catch (e) { console.warn('updateBookingSummary error', e); }
-            try { checkAvailabilityAndUpdateButton(); } catch (e) { /* ignore */ }
-          });
-          hallSelect._summaryListenerAttached = true;
-        }
-
-        // When the dropdown is updated programmatically, ensure the UI reflects the current selection
-        try { updateBookingSummary(); } catch (e) { /* ignore */ }
-
-        console.log('\u2705 Venue dropdown updated with', filtered.length, 'allowed venues from server');
+      // Form submission function
       async function submitBooking() {
         // Get form values
         const hall = document.getElementById('hallSelect').value;
@@ -859,23 +834,14 @@
       
       // Update booking summary based on form inputs
       function updateBookingSummary() {
-        // Get form values (use IDs where possible to avoid selector mismatches)
-        const hallEl = document.getElementById('hallSelect');
-        const hall = hallEl ? hallEl.value : '';
-        const dateEl = document.getElementById('dateInput');
-        const date = dateEl ? dateEl.value : '';
-        const timeEl = document.getElementById('timeInput');
-        const time = timeEl ? timeEl.value : '';
-        const durationEl = document.querySelector('input[placeholder="Duration (in hours)"]');
-        const duration = durationEl ? durationEl.value : '';
-        const attendeesEl = document.getElementById('attendeesInput');
-        const attendees = attendeesEl ? attendeesEl.value : '';
-        const organizerEl = document.getElementById('organizerInput');
-        const organizer = organizerEl ? organizerEl.value : '';
-  const purposeEl = document.getElementById('purposeDescription');
-  const purpose = purposeEl ? purposeEl.value : '';
-  const categoryEl = document.getElementById('purposeCategorySelect');
-  const category = categoryEl ? categoryEl.value : '';
+        // Get form values
+        const hall = document.getElementById('hallSelect').value;
+        const date = document.getElementById('dateInput').value;
+        const time = document.getElementById('timeInput').value;
+        const duration = document.querySelector('input[placeholder="Duration (in hours)"]').value;
+        const attendees = document.querySelector('input[placeholder="Number of Attendees"]').value;
+        const organizer = document.getElementById('organizerInput').value;
+        const purpose = document.querySelector('textarea[placeholder="Purpose of Booking"]').value;
         
         // Update summary fields
         document.getElementById('summaryHall').textContent = hall || 'Please select a hall';
@@ -928,9 +894,6 @@
         } else {
           document.getElementById('summaryPurpose').textContent = 'Please enter purpose';
         }
-
-        // Update purpose category
-        document.getElementById('summaryCategory').textContent = category || 'Please select a category';
       }
       
       // Add event listeners to form inputs to update summary in real-time
@@ -1082,3 +1045,4 @@
     </script>
   </body>
 </html>
+
