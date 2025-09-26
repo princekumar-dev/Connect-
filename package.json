@@ -8,7 +8,10 @@
     "dev": "nodemon server.js",
     "install-deps": "npm install express cors nodemon",
     "migrate": "node migrate.js",
-    "vercel-build": "echo \"No build step required for MSEC Connect (static + serverless).\""
+    "vercel-build": "next build",
+    "next": "next",
+    "build": "next build",
+    "start:next": "next start"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -18,7 +21,10 @@
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "next": "^14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "keywords": [
     "booking",
